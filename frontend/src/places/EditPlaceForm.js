@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react"
 import { useHistory, useParams } from "react-router"
-
 function EditPlaceForm() {
 
 	const history = useHistory()
 
-    const { placeId } = useParams()
+	const { placeId } = useParams()
 
-    const [place, setPlace] = useState({
+	const [place, setPlace] = useState({
 		name: '',
 		pic: '',
 		city: '',
@@ -15,29 +14,31 @@ function EditPlaceForm() {
 		cuisines: ''
 	})
 
+
+
+
+
+
+
 	useEffect(() => {
 		const fetchData = async () => {
-			const response = await fetch(`http://localhost:5000/places/${placeId}`)
+			const response = await fetch(`http://localhost:5001/places/${placeId}`)
 			const resData = await response.json()
 			setPlace(resData)
 		}
 		fetchData()
-	}, [ placeId ])
-
+	}, [placeId])
 	async function handleSubmit(e) {
 		e.preventDefault()
-
-		await fetch(`http://localhost:5000/places/${place.placeId}`, {
+		await fetch(`http://localhost:5001/places/${place.placeId}`, {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(place)
 		})
-
 		history.push(`/places/${place.placeId}`)
 	}
-
 	return (
 		<main>
 			<h1>Edit Place</h1>
@@ -66,6 +67,8 @@ function EditPlaceForm() {
 				</div>
 				<div className="form-group">
 					<label htmlFor="pic">Place Picture</label>
+					
+					
 					<input
 						value={place.pic}
 						onChange={e => setPlace({ ...place, pic: e.target.value })}
@@ -74,6 +77,7 @@ function EditPlaceForm() {
 						name="pic"
 					/>
 				</div>
+
 				<div className="form-group">
 					<label htmlFor="city">City</label>
 					<input
@@ -84,6 +88,9 @@ function EditPlaceForm() {
 						name="city"
 					/>
 				</div>
+
+
+
 				<div className="form-group">
 					<label htmlFor="state">State</label>
 					<input
@@ -107,5 +114,4 @@ function EditPlaceForm() {
 		</main>
 	)
 }
-
 export default EditPlaceForm

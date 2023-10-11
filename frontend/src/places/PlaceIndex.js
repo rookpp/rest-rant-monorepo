@@ -1,21 +1,16 @@
 import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-
 function PlaceIndex(data) {
-
 	const history = useHistory()
-	
 	const [places, setPlaces] = useState([])
-
 	useEffect(() => {
 		const fetchData = async () => {
-			const response = await fetch(`http://localhost:5000/places`)
+			const response = await fetch(`http://localhost:5001/places`)
 			const resData = await response.json()
 			setPlaces(resData)
 		}
 		fetchData()
 	}, [])
-
 	let placesFormatted = places.map((place) => {
 		return (
 			<div className="col-sm-6" key={place.placeId}>
@@ -43,5 +38,4 @@ function PlaceIndex(data) {
 		</main>
 	)
 }
-
 export default PlaceIndex;

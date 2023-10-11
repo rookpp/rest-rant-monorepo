@@ -1,154 +1,92 @@
-import { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router"
-import CommentCard from './CommentCard'
-import NewCommentForm from "./NewCommentForm";
-
-function PlaceDetails() {
-
-	const { placeId } = useParams()
-
+import { useState } from "react"
+import { useHistory } from "react-router"
+function NewPlaceForm() {
 	const history = useHistory()
+	const [place, setPlace] = useState({
+		name: '',
+		pic: '',
+		city: '',
+		state: '',
+		cuisines: ''})
+	async function handleSubmit(e) {
+		e.preventDefault()
 
-	const [place, setPlace] = useState(null)
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const response = await fetch(`http://localhost:5000/places/${placeId}`)
-			const resData = await response.json()
-			setPlace(resData)
-		}
-		fetchData()
-	}, [placeId])
-
-	if (place === null) {
-		return <h1>Loading</h1>
-	}
-
-	function editPlace() {
-		history.push(`/places/${place.placeId}/edit`)
-	}
-
-	async function deletePlace() {
-		await fetch(`http://localhost:5000/places/${place.placeId}`, {
-			method: 'DELETE'
-		})
-		history.push('/places')
-	}
-
-	async function deleteComment(deletedComment) {
-		await fetch(`http://localhost:5000/places/${place.placeId}/comments/${deletedComment.commentId}`, {
-			method: 'DELETE'
-		})
-
-		setPlace({
-			...place,
-			comments: place.comments
-				.filter(comment => comment.commentId !== deletedComment.commentId)
-		})
-	}
-
-	async function createComment(commentAttributes) {
-		const response = await fetch(`http://localhost:5000/places/${place.placeId}/comments`, {
+		await fetch(`http://localhost:5001/places`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(commentAttributes)
+			body: JSON.stringify(place)
 		})
 
-		const comment = await response.json()
-
-		setPlace({
-			...place,
-			comments: [
-				...place.comments,
-				comment
-			]
-		})
-
+		history.push('/places')
 	}
-
-
-
-	let comments = (
-		<h3 className="inactive">
-			No comments yet!
-		</h3>
-	)
-	let rating = (
-		<h3 className="inactive">
-			Not yet rated
-		</h3>
-	)
-	if (place.comments.length) {
-		let sumRatings = place.comments.reduce((tot, c) => {
-			return tot + c.stars
-		}, 0)
-		let averageRating = Math.round(sumRatings / place.comments.length)
-		let stars = ''
-		for (let i = 0; i < averageRating; i++) {
-			stars += '⭐️'
-		}
-		rating = (
-			<h3>
-				{stars} stars
-			</h3>
-		)
-		comments = place.comments.map(comment => {
-			return (
-				<CommentCard key={comment.commentId} comment={comment} onDelete={() => deleteComment(comment)} />
-			)
-		})
-	}
-
-
 	return (
 		<main>
-			<div className="row">
-				<div className="col-sm-6">
-					<img style={{ maxWidth: 200 }} src={place.pic} alt={place.name} />
-					<h3>
-						Located in {place.city}, {place.state}
-					</h3>
+			<h1>Add a New Place</h1>
+			<form onSubmit={handleSubmit}>
+				<div className="form-group">
+					<label htmlFor="name">Place Name</label>
+					<input
+						required
+						value={place.name}
+						onChange={e => setPlace({ ...place, name: e.target.value })}
+						className="form-control"
+						id="name"
+						name="name"/>
 				</div>
-				<div className="col-sm-6">
-					<h1>{place.name}</h1>
-					<h2>
-						Rating
-					</h2>
-					{rating}
-					<br />
-					<h2>
-						Description
-					</h2>
-					<h3>
-						{place.name} has been serving {place.city}, {place.state} since {place.founded}.
-					</h3>
-					<h4>
-						Serving {place.cuisines}.
-					</h4>
-					<br />
-					<a className="btn btn-warning" onClick={editPlace}>
-						Edit
-					</a>{` `}
-					<button type="submit" className="btn btn-danger" onClick={deletePlace}>
-						Delete
-					</button>
+				<div className="form-group">
+					<label htmlFor="founded">Year Founded</label>
+					<input
+						required
+						value={place.founded}
+						onChange={e => setPlace({ ...place, founded: e.target.value })}
+						className="form-control"
+						id="founded"
+						name="founded"
+					/>
 				</div>
-			</div>
-			<hr />
-			<h2>Comments</h2>
-			<div className="row">
-				{comments}
-			</div>
-			<hr />
-			<h2>Got Your Own Rant or Rave?</h2>
-			<NewCommentForm
-				place={place}
-				onSubmit={createComment}
-			/>
+				<div className="form-group">
+					<label htmlFor="pic">Place Picture</label>
+					<input
+						value={place.pic}
+						onChange={e => setPlace({ ...place, pic: e.target.value })}
+						className="form-control"
+						id="pic"
+						name="pic"
+					/>
+				</div>
+				<div className="form-group">
+					<label htmlFor="city">City</label>
+					<input
+						value={place.city}
+						onChange={e => setPlace({ ...place, city: e.target.value })}
+						className="form-control"
+						id="city"
+						name="city"
+					/>
+				</div>
+				<div className="form-group">
+					<label htmlFor="state">State</label>
+					<input
+						value={place.state}
+						onChange={e => setPlace({ ...place, state: e.target.value })}
+						className="form-control"
+						id="state"
+						name="state"
+					/>
+				</div>
+				<div className="form-group">
+					<label htmlFor="cuisines">Cuisines</label>
+					<input
+						value={place.cuisines}
+						onChange={e => setPlace({ ...place, cuisines: e.target.value })}
+						className="form-control"
+						id="cuisines" name="cuisines" required />
+				</div>
+				<input className="btn btn-primary" type="submit" value="Add Place" />
+			</form>
 		</main>
 	)
 }
-
-export default PlaceDetails
+export default NewPlaceForm
